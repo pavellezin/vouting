@@ -5,11 +5,10 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import pro.paullezin.bootjava.vouting.model.Role;
 import pro.paullezin.bootjava.vouting.model.User;
 import pro.paullezin.bootjava.vouting.repository.UserRepository;
 
-import java.util.Set;
+import java.util.Optional;
 
 @SpringBootApplication
 @AllArgsConstructor
@@ -23,5 +22,8 @@ public class VoutingApplication implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         System.out.println(userRepository.findAll());
+        System.out.println(userRepository.findByLastNameContainingIgnoreCase("last"));
+        Optional<User> user = userRepository.findByEmailIgnoreCase("user@gmail.com");
+        System.out.println(user.isPresent() ? user.get() : "No such user");
     }
 }
