@@ -28,3 +28,8 @@ spring:
     rest:
       base-path: /api
       return-body-on-create: true
+#  jackson:
+#    visibility.field: any
+#    visibility.getter: none
+#    visibility.setter: none
+#    visibility.is-getter: none
