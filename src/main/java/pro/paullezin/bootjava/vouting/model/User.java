@@ -1,6 +1,11 @@
 package pro.paullezin.bootjava.vouting.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.*;
+import org.springframework.util.StreamUtils;
+import org.springframework.util.StringUtils;
+import pro.paullezin.bootjava.vouting.util.JsonDeserializers;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -34,6 +39,8 @@ public class User extends BaseEntity implements Serializable {
 
     @Column(name = "password")
     @Size(max = 256)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonDeserialize(using = JsonDeserializers.PasswordDesirializer.class)
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -41,4 +48,8 @@ public class User extends BaseEntity implements Serializable {
     @Column(name = "role")
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Role> roles;
+
+    public void setEmail(String email) {
+        this.email = StringUtils.hasText(email) ? email.toLowerCase() : null;
+    }
 }

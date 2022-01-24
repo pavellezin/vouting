@@ -8,9 +8,11 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import pro.paullezin.bootjava.vouting.model.Role;
 import pro.paullezin.bootjava.vouting.model.User;
 import pro.paullezin.bootjava.vouting.repository.UserRepository;
@@ -25,6 +27,7 @@ import java.util.Optional;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserRepository userRepository;
+    public static final PasswordEncoder PASSWORD_ENCODER = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
     public UserDetailsService userDetailsService() {
         return email -> {
@@ -39,7 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService())
-                .passwordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
+                .passwordEncoder(PASSWORD_ENCODER);
     }
 
     @Override
@@ -47,6 +50,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("/api/account").hasRole(Role.USER.name())
                 .antMatchers("/api/**").hasRole(Role.ADMIN.name())
-                .and().formLogin();
+                .and().httpBasic()
+                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().csrf().disable();
     }
 }
