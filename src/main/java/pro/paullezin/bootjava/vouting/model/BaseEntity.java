@@ -23,7 +23,6 @@ public class BaseEntity implements Persistable<Integer> {
 
     @Override
     public Integer getId() {
-        Assert.notNull(id, "Entity must have id");
         return id;
     }
 
