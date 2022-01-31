@@ -28,6 +28,7 @@ spring:
     rest:
       base-path: /api
       return-body-on-create: true
+      default-page-size: 20
 #  jackson:
 #    visibility.field: any
 #    visibility.getter: none
@@ -38,6 +39,12 @@ spring:
 #      name: user
 #      password: password
 #      roles: USER
+
+server.servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 logging:
   level:

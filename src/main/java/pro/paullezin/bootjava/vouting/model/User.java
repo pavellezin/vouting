@@ -3,7 +3,6 @@ package pro.paullezin.bootjava.vouting.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.*;
-import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 import pro.paullezin.bootjava.vouting.util.JsonDeserializers;
 

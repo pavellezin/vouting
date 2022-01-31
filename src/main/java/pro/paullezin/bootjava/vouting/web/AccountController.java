@@ -2,6 +2,11 @@ package pro.paullezin.bootjava.vouting.web;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.rest.webmvc.RepositoryLinksResource;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.server.RepresentationModelProcessor;
+import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,18 +23,27 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.Set;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+
 @RestController
-@RequestMapping(value = "/api/account")
+@RequestMapping("/api/account")
 @AllArgsConstructor
 @Slf4j
-public class AccountController {
-
+public class AccountController implements RepresentationModelProcessor<RepositoryLinksResource> {
     private final UserRepository userRepository;
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Object get(@AuthenticationPrincipal AuthUser authUser) {
+    @SuppressWarnings("unchecked")
+    private static final RepresentationModelAssemblerSupport<User, EntityModel<User>> ASSEMBLER = new RepresentationModelAssemblerSupport<>(AccountController.class, (Class<EntityModel<User>>) (Class<?>) EntityModel.class) {
+        @Override
+        public EntityModel<User> toModel(User user) {
+            return EntityModel.of(user, linkTo(AccountController.class).withSelfRel());
+        }
+    };
+
+    @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
+    public EntityModel<User> get(@AuthenticationPrincipal AuthUser authUser) {
         log.info("get {}", authUser);
-        return authUser;
+        return ASSEMBLER.toModel(authUser.getUser());
     }
 
     @DeleteMapping
@@ -38,9 +52,9 @@ public class AccountController {
         log.info("delete {}", authUser);
     }
 
-    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/register", consumes = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<User> register(@Valid @RequestBody User user) {
+    public ResponseEntity<EntityModel<User>> register(@Valid @RequestBody User user) {
         log.info("register {}", user);
         ValidationUtil.checkNew(user);
         user.setRoles(Set.of(Role.USER));
@@ -48,7 +62,7 @@ public class AccountController {
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/api/account")
                 .build().toUri();
-        return ResponseEntity.created(uri).body(user);
+        return ResponseEntity.created(uri).body(ASSEMBLER.toModel(user));
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -64,4 +78,9 @@ public class AccountController {
         userRepository.save(user);
     }
 
+    @Override
+    public RepositoryLinksResource process(RepositoryLinksResource model) {
+        model.add(linkTo(AccountController.class).withRel("account"));
+        return model;
+    }
 }
