@@ -1,10 +1,12 @@
 package pro.paullezin.bootjava.vouting.util;
 
+import lombok.experimental.UtilityClass;
 import pro.paullezin.bootjava.vouting.error.IllegalRequestDataException;
 import pro.paullezin.bootjava.vouting.model.BaseEntity;
 
 import java.util.Objects;
 
+@UtilityClass
 public class ValidationUtil {
 
     public static void checkNew(BaseEntity entity) {

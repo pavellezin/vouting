@@ -8,6 +8,8 @@ spring:
         default_batch_fetch_size: 20
         format_sql: true
         jdbc.batch_size: 20
+    hibernate:
+      ddl-auto: create
   datasource:
     url: jdbc:h2:mem:voting
 #    tcp: jdbc:h2:tcp://localhost:9092/mem:voting
